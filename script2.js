@@ -185,12 +185,10 @@ function formatTime(time) {
 
 // Function to update button text and image based on playback state
 function updateButtonText(index, text) {
-  const playBtn = document.querySelector(`.song${index + 1}`);
-  const playBtnImage = document.querySelector(`.songPlayBtn.song${index + 1}`);
+  const playBtn = document.querySelector(`.play-btn.song${index + 1}`);
 
-  if (playBtn && playBtnImage) {
+  if (playBtn) {
     playBtn.textContent = text;
-    playBtnImage.src = text === "Pause" ? "pause.svg" : "musicPlay.svg";
   }
 }
 

@@ -7,14 +7,20 @@
 body {
   background-color: black;
   color: #fff;
+  width: 100%;
 }
 .left {
   width: 30vw;
+  height: 100%;
   padding: 10px;
 }
 .right {
   width: 75vw;
   position: relative;
+  border-radius: 5px;
+  max-height: 95vh;
+  overflow: scroll;
+  margin: 16px;
 }
 .home {
   padding: 10px;
@@ -48,7 +54,6 @@ body {
   display: flex;
   align-items: top;
   justify-content: center;
-  /* font-style: 10px; */
   gap: 8px;
   position: absolute;
   bottom: 0;
@@ -59,35 +64,53 @@ body {
   color: grey;
   text-decoration: none;
 }
-.right {
-  margin: 16px 0;
-}
 .header {
+  width: 67.6vw;
   display: flex;
   justify-content: space-between;
   background-color: rgb(34, 34, 34);
   border-top-left-radius: 5px;
+  position: fixed;
+  overflow: auto;
+  z-index: 1;
+  margin-top: -2.5px;
 }
 .header > * {
   padding: 20px;
 }
+.spotifyPlaylist{
+  overflow: auto;
+  margin-top: 100px;
+}
 
-.spotifyPlaylist {
-  padding: 16px;
+.album-DIV .album-name{
+  width: 95%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: -10px;
+  padding: 15px 18px;
+}
+.album-name h1{
+  font-size: 24px;
+}
+.album-name a{
+  font-style: 16px;
+  color: #B3B3B3;
+  cursor: pointer;
+  text-decoration: none;
 }
 .cardContainer {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   margin: 10px;
-  overflow-y: scroll;
   max-height: 65vh;
 }
 .card {
   width: 180px;
-  padding: 10px;
+  padding: 8px;
   border-radius: 5px;
-  background-color: #252525;
   position: relative;
 }
 .card > * {
@@ -96,6 +119,14 @@ body {
 .card img {
   width: 100%;
   object-fit: contain;
+}
+.card h2{
+  font-size: 16px;
+}
+.card p{
+  font-style: 12px;
+  color: #B3B3B3;
+  font-weight: 400;
 }
 .play {
   width: 28px;
@@ -151,7 +182,7 @@ body {
   filter: invert(1);
   display: inline;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
   position: fixed;
   bottom: 25px;
   height: 45px;
@@ -160,6 +191,7 @@ body {
   padding: 12px;
 }
 .duration{
+  display: flex;
   width: 20vw;
   height: 10px;
 }
@@ -168,7 +200,7 @@ body {
   width: 65vw;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
   text-align: center; 
 }
 .playBar-content .songinfo{
