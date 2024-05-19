@@ -1,0 +1,98 @@
+*{
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+.main{
+    width: 100%;
+    height: 100vh;
+    background-color: #121212;
+}
+.content{
+    height: 88%;
+}
+.playbar{
+    width: 100%;
+    height: 12%;
+    background-color: black;
+    display: flex;
+    justify-content: space-around;
+}
+.songName{
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+.songName img{
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    padding-left: 10px;
+}
+.songinfo{
+    padding-left: 14px;
+}
+.playBtn{
+    width: 40%;
+    display: inline;
+    align-items: center;
+    justify-content: center;
+}
+.playBar-btn{
+    margin-left: calc(30%);
+}
+.playBar-btn i{
+    padding: 15px;
+}
+.bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.seekbar{
+  height: 2px;
+  width: 35%;
+  background-color:  grey;
+  border-radius: 10px;
+  position: absolute;
+  margin: 2.5%;
+}
+.circle{
+    width: 13px;
+  height: 13px;
+  border-radius: 13px;
+  background-color: rgb(242, 126, 64);
+  position: relative;
+  bottom: 6px;
+  left: 0%;
+  transition: left 0.5s;
+}
+.additionalBtn{
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.additionalBtn i{
+    padding: 10px 20px;
+    
+}
+.volumeBar{
+  height: 2px;
+  width: 10%;
+  background-color:  grey;
+  border-radius: 10px;
+  position: absolute;
+  margin-left: 15%;
+}
+.volCircle{
+    width: 13px;
+  height: 13px;
+  border-radius: 13px;
+  background-color: rgb(242, 126, 64);
+  position: relative;
+  bottom: 6px;
+  left: 0%;
+  transition: left 0.5s;
+}

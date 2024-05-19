@@ -90,6 +90,9 @@ function playSong(index) {
   const songDurationElement = document.querySelector(".song-duration");
   songDurationElement.textContent = formatTime(audio[index].duration);
 
+  const songTotalTime = document.querySelector(".total-time");
+  songTotalTime.textContent = formatTime(audio[index].duration);
+
   // Start updating seek bar and song duration display
   updateSeekBar();
 
@@ -210,3 +213,24 @@ document.querySelectorAll(".song-card").forEach((card, index) => {
   card.querySelector(".song-name").textContent = songNames[index];
   card.querySelector(".artist-name").textContent = artistNames[index];
 });
+
+
+
+// Function to handle hover effect
+function addHoverEffect(iconClass, textClass) {
+  const icon = document.querySelector(`.${iconClass}`);
+  const text = document.querySelector(`.${textClass}`);
+  
+  icon.addEventListener('mouseover', () => {
+    text.style.opacity = '1';
+  });
+  
+  icon.addEventListener('mouseout', () => {
+    text.style.opacity = '0';
+  });
+}
+
+// Apply hover effects
+addHoverEffect('mic', 'Lyrics');
+addHoverEffect('bars', 'Queue');
+addHoverEffect('plug', 'Connect');

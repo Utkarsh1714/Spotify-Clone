@@ -30,9 +30,10 @@ body {
   width: 75vw;
   position: relative;
   border-radius: 5px;
-  max-height: 95vh;
+  max-height: 83vh;
   overflow: scroll;
   margin: 16px;
+  border-radius: 5px;
 }
 
 .home ul li {
@@ -57,7 +58,7 @@ body {
   width: 30px;
 }
 .library {
-  min-height: 72.5vh;
+  max-height: 70vh;
   position: relative;
 }
 .footer {
@@ -75,7 +76,7 @@ body {
   text-decoration: none;
 }
 .header {
-  width: 67.6vw;
+  width: 68.2vw;
   display: flex;
   justify-content: space-between;
   background-color: rgb(34, 34, 34);
@@ -89,7 +90,6 @@ body {
   padding: 20px;
 }
 .spotifyPlaylist{
-  overflow: auto;
   margin-top: 100px;
 }
 
@@ -122,6 +122,9 @@ body {
   padding: 8px;
   border-radius: 5px;
   position: relative;
+}
+.card:hover{
+  background-color: #171717;
 }
 .card > * {
   padding-top: 10px;
@@ -187,29 +190,6 @@ body {
   width: 80px;
   cursor: pointer;
   font-size: 17px;
-}
-.playbar{
-  filter: invert(1);
-  display: inline;
-  align-items: center;
-  justify-content: space-between;
-  position: fixed;
-  bottom: 19px;
-  height: 50px;
-  background-color: rgb(230, 231, 230);
-  width: 66.5vw;
-  padding: 12px;
-}
-.duration{
-  display: flex;
-}
-.playBar-content{
-  float: left;
-  width: 65vw;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  text-align: center;
 }
 
 .songinfo h2{
@@ -299,25 +279,108 @@ body {
 .songsLists .info h6{
   margin-top: -10px;
 }
-
-.seekbar{
-  height: 2px;
-  width: 98%;
-  background-color:  black;
-  border-radius: 10px;
-  position: absolute;
-  bottom: 5px;
-  margin: 6px;
-  margin-left: -4px;
+.playbar{
+  width: 100%;
+  height: 12%;
+  background-color: black;
+  display: flex;
+  justify-content: space-around;
+  position: fixed;
+  z-index: 1;
 }
-
+.songName{
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+.songName img{
+  width: 60px;
+  height: 60px;
+  background-color: #fff;
+  padding-left: 10px;
+}
+.songinfo{
+  padding-left: 14px;
+}
+.playBtn{
+  width: 40%;
+  display: inline;
+  align-items: center;
+  justify-content: center;
+}
+.playBar-btn{
+  margin-left: calc(30%);
+}
+.playBar-btn i{
+  padding: 15px;
+}
+.bar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.seekbar{
+height: 2px;
+width: 35%;
+background-color:  grey;
+border-radius: 10px;
+position: absolute;
+margin: 2.5%;
+}
 .circle{
   width: 13px;
-  height: 13px;
-  border-radius: 13px;
-  background-color: black;
-  position: relative;
-  bottom: 6px;
-  left: 0%;
-  transition: left 0.5s;
+height: 13px;
+border-radius: 13px;
+background-color: rgb(242, 126, 64);
+position: relative;
+bottom: 6px;
+left: 0%;
+transition: left 0.5s;
+}
+.additionalBtn{
+  width: 27%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.additionalBtn .btns i{
+  padding: 10px 20px;
+  cursor: pointer;
+}
+.btns-name{
+  margin-top: -20px;
+  display: flex;
+  padding: 0 2px;
+  
+}
+.btns-name p{
+  background-color: #333232;
+  border: 1px solid #171717;
+  padding: 2px 5px;
+  font-size: 14px;
+}
+.additionalBtn i{
+  margin-left: -10px;
+}
+.addbtns .fullscreen p{
+  margin-left: 10%;
+}
+.volumeBar{
+height: 2px;
+width: 10%;
+background-color:  grey;
+border-radius: 10px;
+position: absolute;
+margin-left: 12%;
+}
+.volCircle{
+  width: 13px;
+height: 13px;
+border-radius: 13px;
+background-color: rgb(242, 126, 64);
+position: relative;
+bottom: 6px;
+left: 0%;
+transition: left 0.5s;
 }
