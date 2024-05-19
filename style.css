@@ -330,13 +330,12 @@ margin: 2.5%;
 }
 .seekbar{
   height: 2px;
-  width: 98%;
-  background-color:  black;
+  width: 35%;
+  background-color:  white;
   border-radius: 10px;
   position: absolute;
   bottom: 5px;
-  margin: 6px;
-  margin-left: -4px;
+  margin: 22px 38px;
 }
 .circle{
   width: 13px;
