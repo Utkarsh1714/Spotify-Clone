@@ -6,6 +6,8 @@ let pausedTime = {}; // Track paused time for each song
 let currentSongIndex = -1;
 let startTime = 0; // Track start time for current song
 let animationFrameId = null;
+let isSeeking = false; // Flag to track if user is seeking
+let isDragging = false; // Flag to check if dragging is happening
 
 const songPaths = [
   "./songs/Dil-Ibadat.mp3",
@@ -52,65 +54,46 @@ Promise.all(
     fetch(path)
       .then((response) => response.arrayBuffer())
       .then((arrayBuffer) => ctx.decodeAudioData(arrayBuffer))
+      .catch((error) => {
+        console.error(`Error loading audio file ${path}:`, error);
+        return null; // Return null if an error occurs
+      })
   )
 )
   .then((decodedAudios) => {
-    audio = decodedAudios;
+    audio = decodedAudios.filter(Boolean); // Filter out any null values
   })
   .catch((error) => {
-    console.error("Error loading audio:", error);
+    console.error("Error loading audio files:", error);
   });
 
 // Function to play a song
 function playSong(index) {
-  if (currentSongIndex !== index) {
-    stopCurrentSong(); // Stop the current song if playing
+  if (audio[index]) {
+    if (currentSongIndex !== index || !isPlaying) {
+      stopCurrentSong(); // Stop the current song if playing
 
-    const playSound = ctx.createBufferSource();
-    playSound.buffer = audio[index];
-    playSound.connect(ctx.destination);
-    playSound.start(0, pausedTime[index] || 0); // Start from paused time if available
+      const playSound = ctx.createBufferSource();
+      playSound.buffer = audio[index];
+      playSound.connect(ctx.destination);
+      playSound.start(0, pausedTime[index] || 0); // Start from paused time if available
 
-    currentSource = playSound;
-    currentSongIndex = index;
-    isPlaying = true;
-    // Calculate start time
-    startTime = ctx.currentTime - (pausedTime[index] || 0); 
+      currentSource = playSound;
+      currentSongIndex = index;
+      isPlaying = true;
+      startTime = ctx.currentTime - (pausedTime[index] || 0);
 
-    // Update button text for the selected song
-    updateButtonText(index, "Pause");
+      updateButtonText(index, "Pause");
+      updatePlayBar(index);
 
-    // Update song title in the playbar
-    const playBarSongTitle = document.querySelector(".playbar-song-title");
-    const playBarArtistName = document.querySelector(".playbar-artist-name");
-    playBarSongTitle.textContent = songNames[index];
-    playBarArtistName.textContent = artistNames[index];
+      resetOtherButtons(index);
 
-    // Update song duration display
-  const songDurationElement = document.querySelector(".song-duration");
-  songDurationElement.textContent = formatTime(audio[index].duration);
-
-  const songTotalTime = document.querySelector(".total-time");
-  songTotalTime.textContent = formatTime(audio[index].duration);
-
-  // Start updating seek bar and song duration display
-  updateSeekBar();
-
-    // Reset button text for other songs
-    for (let i = 0; i < songPaths.length; i++) {
-      if (i !== index) {
-        updateButtonText(i, "Play Now");
-      }
+      updateSeekBar();
+    } else {
+      togglePauseResume(); // Toggle pause/resume for the current song
     }
-  } else {
-    togglePauseResume(); // Toggle pause/resume for the current song
-  }
 
-  // Reset paused time for the previously played song
-  for (let i = 0; i < songPaths.length; i++) {
-    if (i !== index) {
-      pausedTime[i] = 0; // Reset paused time to 0 for other songs
-    }
+    resetPausedTime(index);
   }
 }
 
@@ -120,7 +103,7 @@ function stopCurrentSong() {
     currentSource.stop();
     currentSource = null;
     isPlaying = false;
-    pausedTime[currentSongIndex] = ctx.currentTime - startTime; // Store the paused time for the current song
+    pausedTime[currentSongIndex] = ctx.currentTime - startTime; // Store the pause time for the current song
 
     // Reset button text for the current song
     if (currentSongIndex !== -1) {
@@ -137,44 +120,46 @@ function togglePauseResume() {
   if (isPlaying && currentSource) {
     currentSource.stop();
     isPlaying = false;
-    pausedTime[currentSongIndex] = ctx.currentTime - startTime; // Store the paused time
+    pausedTime[currentSongIndex] = ctx.currentTime - startTime; // Store the pause time
     updateButtonText(currentSongIndex, "Resume");
     cancelAnimationFrame(animationFrameId); // Stop updating seek bar
   } else if (currentSongIndex !== -1) {
     const playSound = ctx.createBufferSource();
     playSound.buffer = audio[currentSongIndex];
     playSound.connect(ctx.destination);
-    playSound.start(0, pausedTime[currentSongIndex] || 0); // Start from paused time if available
+    playSound.start(0, pausedTime[currentSongIndex] || 0); // Start from pause time if available
 
     currentSource = playSound;
     isPlaying = true;
-    startTime = ctx.currentTime - (pausedTime[currentSongIndex] || 0); // Calculate start time
+    startTime = ctx.currentTime - (pausedTime[currentSongIndex] || 0); // Calculate the start time
     updateButtonText(currentSongIndex, "Pause");
 
-    // Start updating seek bar and song duration display
+    // Start updating the seek bar and song duration display
     updateSeekBar();
   }
 }
 
-// Function to update the seek bar and song duration display based on current playback
+// Function to update the seek bar and song duration display
 function updateSeekBar() {
-  const songDurationElement = document.querySelector(".song-duration");
-  const elapsedTime = ctx.currentTime - startTime;
-  const formattedTime = formatTime(elapsedTime);
+  if (!isDragging && isPlaying) {
+    const songDurationElement = document.querySelector(".song-duration");
+    const elapsedTime = ctx.currentTime - startTime;
+    const formattedTime = formatTime(elapsedTime);
 
-  songDurationElement.textContent = formattedTime;
+    songDurationElement.textContent = formattedTime;
 
-  const progress = elapsedTime / audio[currentSongIndex].duration;
-  const seekBarWidth = document.querySelector('.seekbar').clientWidth;
-  const newPosition = progress * seekBarWidth;
+    const progress = elapsedTime / audio[currentSongIndex].duration;
+    const seekBarWidth = document.querySelector(".seekbar").clientWidth;
+    const newPosition = progress * seekBarWidth;
 
-  const circle = document.querySelector('.circle');
-  circle.style.left = `${newPosition}px`;
+    const circle = document.querySelector(".circle");
+    circle.style.left = `${progress * 100}%`;
 
-  animationFrameId = requestAnimationFrame(updateSeekBar);
+    animationFrameId = requestAnimationFrame(updateSeekBar);
 
-  if (progress >= 1) {
-    stopCurrentSong();
+    if (progress >= 1) {
+      stopCurrentSong();
+    }
   }
 }
 
@@ -189,9 +174,39 @@ function formatTime(time) {
 // Function to update button text and image based on playback state
 function updateButtonText(index, text) {
   const playBtn = document.querySelector(`.play-btn.song${index + 1}`);
-
   if (playBtn) {
     playBtn.textContent = text;
+  }
+}
+
+// Function to update the play bar with song information
+function updatePlayBar(index) {
+  const playBarSongTitle = document.querySelector(".playbar-song-title");
+  const playBarArtistName = document.querySelector(".playbar-artist-name");
+  playBarSongTitle.textContent = songNames[index];
+  playBarArtistName.textContent = artistNames[index];
+
+  const songDurationElement = document.querySelector(".song-duration");
+  const songTotalTime = document.querySelector(".total-time");
+  songDurationElement.textContent = formatTime(audio[index].duration);
+  songTotalTime.textContent = formatTime(audio[index].duration);
+}
+
+// Function to reset button text for all other songs
+function resetOtherButtons(index) {
+  for (let i = 0; i < songPaths.length; i++) {
+    if (i !== index) {
+      updateButtonText(i, "Play Now");
+    }
+  }
+}
+
+// Function to reset paused time for all other songs
+function resetPausedTime(index) {
+  for (let i = 0; i < songPaths.length; i++) {
+    if (i !== index) {
+      pausedTime[i] = 0;
+    }
   }
 }
 
@@ -204,9 +219,7 @@ document.querySelectorAll(".play-btn").forEach((button, index) => {
 
 // Event listener for pause/resume button in playBar
 const playBarBtn = document.querySelector(".playBtn");
-playBarBtn.addEventListener("click", () => {
-  togglePauseResume(); // Toggle pause/resume for the current song
-});
+playBarBtn.addEventListener("click", togglePauseResume);
 
 // Update song names and artists in the DOM
 document.querySelectorAll(".song-card").forEach((card, index) => {
@@ -214,23 +227,104 @@ document.querySelectorAll(".song-card").forEach((card, index) => {
   card.querySelector(".artist-name").textContent = artistNames[index];
 });
 
-
-
 // Function to handle hover effect
 function addHoverEffect(iconClass, textClass) {
   const icon = document.querySelector(`.${iconClass}`);
   const text = document.querySelector(`.${textClass}`);
-  
-  icon.addEventListener('mouseover', () => {
-    text.style.opacity = '1';
+
+  icon.addEventListener("mouseover", () => {
+    text.style.opacity = "1";
   });
-  
-  icon.addEventListener('mouseout', () => {
-    text.style.opacity = '0';
+
+  icon.addEventListener("mouseout", () => {
+    text.style.opacity = "0";
   });
 }
 
 // Apply hover effects
-addHoverEffect('mic', 'Lyrics');
-addHoverEffect('bars', 'Queue');
-addHoverEffect('plug', 'Connect');
+addHoverEffect("mic", "Lyrics");
+addHoverEffect("bars", "Queue");
+addHoverEffect("plug", "Connect");
+
+// // Optional: Add click/drag event listeners for seek bar to allow user seeking
+document.querySelector(".seekbar").addEventListener("click", (event) => {
+  if (currentSongIndex !== -1) {
+    const seekBarWidth = event.target.clientWidth;
+    const clickPosition = event.offsetX;
+    const seekTime =
+      (clickPosition / seekBarWidth) * audio[currentSongIndex].duration;
+    pausedTime[currentSongIndex] = seekTime;
+    startTime = ctx.currentTime - seekTime;
+    if (isPlaying) {
+      playSong(currentSongIndex);
+    }
+  }
+});
+
+// Function to handle seeking when clicking on seekbar
+function seek(event) {
+  if (currentSongIndex !== -1) {
+    const seekBar = document.querySelector(".seekbar");
+    const seekBarRect = seekBar.getBoundingClientRect();
+    const seekBarWidth = seekBarRect.width;
+    const clickPosition = event.clientX - seekBarRect.left;
+    const seekTime =
+      (clickPosition / seekBarWidth) * audio[currentSongIndex].duration;
+    pausedTime[currentSongIndex] = seekTime;
+    startTime = ctx.currentTime - seekTime;
+    if (isPlaying) {
+      playSong(currentSongIndex);
+    } else {
+      updateSeekBar(); // Update seek bar position when not playing
+    }
+  }
+}
+
+// Function to handle dragging the circle
+function startDragging(event) {
+  event.preventDefault();
+  isDragging = true;
+  document.addEventListener("mousemove", drag);
+  document.addEventListener("mouseup", stopDragging);
+}
+
+function drag(event) {
+  const seekBar = document.querySelector(".seekbar");
+  const seekBarRect = seekBar.getBoundingClientRect();
+  const seekBarWidth = seekBarRect.width;
+  const clickPosition = event.clientX - seekBarRect.left;
+  const progress = clickPosition / seekBarWidth;
+
+  if (currentSongIndex !== -1) {
+    const seekTime = progress * audio[currentSongIndex].duration;
+    pausedTime[currentSongIndex] = seekTime;
+    startTime = ctx.currentTime - seekTime;
+
+    const circle = document.querySelector(".circle");
+    circle.style.left = `${progress * 100}%`;
+
+    const songDurationElement = document.querySelector(".song-duration");
+    songDurationElement.textContent = formatTime(seekTime);
+  }
+}
+
+// Function to handle stopping the drag
+function stopDragging(event) {
+  isDragging = false;
+  document.removeEventListener("mousemove", drag);
+  document.removeEventListener("mouseup", stopDragging);
+
+  if (isPlaying && currentSongIndex !== -1) {
+    playSong(currentSongIndex);
+  } else {
+    updateSeekBar(); // Update seek bar position when not playing
+  }
+}
+
+// Adding event listener to the circle for dragging
+const circle = document.querySelector(".circle");
+circle.addEventListener("mousedown", startDragging);
+
+// Adding event listener to the seekbar for clicking  
+const seekBar = document.querySelector(".seekbar");
+seekBar.addEventListener("click", seek);

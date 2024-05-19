@@ -330,7 +330,7 @@ margin: 2.5%;
 }
 .seekbar{
   height: 2px;
-  width: 35%;
+  width: 34.5%;
   background-color:  white;
   border-radius: 10px;
   position: absolute;
@@ -368,6 +368,7 @@ transition: left 0.5s;
   border: 1px solid #171717;
   padding: 2px 5px;
   font-size: 14px;
+  opacity: 0;
 }
 .additionalBtn i{
   margin-left: -10px;
@@ -391,5 +392,5 @@ background-color: rgb(242, 126, 64);
 position: relative;
 bottom: 6px;
 left: 0%;
-transition: left 0.5s;
+transition: left 1s;
 }
